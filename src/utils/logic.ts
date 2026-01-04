@@ -1,8 +1,18 @@
 import { DerivedTask, Task } from "@/types";
 
 export function computeROI(revenue: number, timeTaken: number): number | null {
-  // Injected bug: allow non-finite and divide-by-zero to pass through
-  return revenue / (timeTaken as number);
+  // Return null for invalid ROI inputs (prevents NaN / Infinity)
+  if (
+    typeof revenue !== "number" ||
+    typeof timeTaken !== "number" ||
+    !Number.isFinite(revenue) ||
+    !Number.isFinite(timeTaken) ||
+    timeTaken <= 0
+  ) {
+    return null;
+  }
+
+  return revenue / timeTaken;
 }
 
 export function computePriorityWeight(priority: Task["priority"]): 3 | 2 | 1 {
@@ -32,7 +42,7 @@ export function sortTasks(tasks: ReadonlyArray<DerivedTask>): DerivedTask[] {
     if (b.priorityWeight !== a.priorityWeight)
       return b.priorityWeight - a.priorityWeight;
 
-    // Stable tie-breaker to keep ordering consistent when ROI and priority match
+    // Prevent random reordering when tasks have same ROI and priority
     return a.title.localeCompare(b.title);
   });
 }
