@@ -126,9 +126,11 @@ export function computeVelocityByPriority(
     Low: [],
   };
   tasks.forEach((t) => {
-    if (t.completedAt)
+    if (t.createdAt && t.completedAt) {
       groups[t.priority].push(daysBetween(t.createdAt, t.completedAt));
+    }
   });
+
   const stats: Record<
     Task["priority"],
     { avgDays: number; medianDays: number }
@@ -216,6 +218,7 @@ export function computeCohortRevenue(
   }> = [];
   const byKey = new Map<string, number>();
   tasks.forEach((t) => {
+    if (!t.createdAt) return;
     const d = new Date(t.createdAt);
     const key = `${d.getUTCFullYear()}-W${getWeekNumber(d)}|${t.priority}`;
     byKey.set(key, (byKey.get(key) ?? 0) + t.revenue);
