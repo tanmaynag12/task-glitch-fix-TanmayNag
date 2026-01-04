@@ -1,5 +1,5 @@
-export type Priority = 'High' | 'Medium' | 'Low';
-export type Status = 'Todo' | 'In Progress' | 'Done';
+export type Priority = "High" | "Medium" | "Low";
+export type Status = "Todo" | "In Progress" | "Done";
 
 export interface Task {
   id: string;
@@ -9,9 +9,12 @@ export interface Task {
   priority: Priority;
   status: Status;
   notes?: string;
-  createdAt: string; // ISO date string
+  createdAt?: string; // ISO date string
   completedAt?: string; // ISO date string if Done
 }
+
+//  input type for task creation (form → store)
+export type NewTask = Omit<Task, "id" | "createdAt" | "completedAt">;
 
 export interface DerivedTask extends Task {
   roi: number | null; // null means N/A
@@ -24,7 +27,5 @@ export interface Metrics {
   timeEfficiencyPct: number; // 0..100
   revenuePerHour: number; // may be NaN/Infinity -> handle in UI
   averageROI: number; // average over valid ROI values
-  performanceGrade: 'Excellent' | 'Good' | 'Needs Improvement';
+  performanceGrade: "Excellent" | "Good" | "Needs Improvement";
 }
-
-

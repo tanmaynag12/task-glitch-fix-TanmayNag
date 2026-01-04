@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { DerivedTask, Metrics, Task } from "@/types";
+import { DerivedTask, Metrics, Task, NewTask } from "@/types";
 import {
   computeAverageROI,
   computePerformanceGrade,
@@ -19,7 +19,7 @@ interface UseTasksState {
   derivedSorted: DerivedTask[];
   metrics: Metrics;
   lastDeleted: Task | null;
-  addTask: (task: Omit<Task, "id"> & { id?: string }) => void;
+  addTask: (task: NewTask & { id?: string }) => void;
   updateTask: (id: string, patch: Partial<Task>) => void;
   deleteTask: (id: string) => void;
   undoDelete: () => void;
@@ -158,7 +158,7 @@ export function useTasks(): UseTasksState {
     };
   }, [tasks]);
 
-  const addTask = useCallback((task: Omit<Task, "id"> & { id?: string }) => {
+  const addTask = useCallback((task: NewTask & { id?: string }) => {
     setTasks((prev) => {
       const id = task.id ?? crypto.randomUUID();
       const timeTaken = task.timeTaken <= 0 ? 1 : task.timeTaken; // auto-correct
