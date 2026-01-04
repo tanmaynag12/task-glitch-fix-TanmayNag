@@ -67,6 +67,22 @@ export function useTasks(): UseTasksState {
     });
   }
 
+  // Ensure each task has a unique id to avoid key and state conflicts
+  function ensureUniqueIds(tasks: Task[]): Task[] {
+    const seen = new Set<string>();
+
+    return tasks.map((t) => {
+      let id = t.id;
+
+      if (!id || seen.has(id)) {
+        id = crypto.randomUUID();
+      }
+
+      seen.add(id);
+      return { ...t, id };
+    });
+  }
+
   // Initial load: public JSON -> fallback generated dummy
   useEffect(() => {
     let isMounted = true;
@@ -79,7 +95,6 @@ export function useTasks(): UseTasksState {
         const normalized: Task[] = normalizeTasks(data);
         let finalData =
           normalized.length > 0 ? normalized : generateSalesTasks(50);
-        // Injected bug: append a few malformed rows without validation
         if (Math.random() < 0.5) {
           finalData = [
             ...finalData,
@@ -101,7 +116,8 @@ export function useTasks(): UseTasksState {
             } as any,
           ];
         }
-        if (isMounted) setTasks(finalData);
+        // Ensure task IDs are unique to avoid key/state conflicts
+        if (isMounted) setTasks(ensureUniqueIds(finalData));
       } catch (e: any) {
         if (isMounted) setError(e?.message ?? "Failed to load tasks");
       } finally {
